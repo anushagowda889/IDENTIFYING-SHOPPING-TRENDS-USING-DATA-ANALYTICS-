@@ -1,0 +1,93 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load the CSV file
+df = pd.read_csv('/mnt/data/shopping_trends (1).csv')
+
+# Display basic information
+print("Data Summary:")
+print(df.info())
+print("\nFirst 5 rows:")
+print(df.head())
+
+# Convert date column to datetime if applicable
+df['date'] = pd.to_datetime(df['date'], errors='coerce')
+
+# Handling missing values
+df.fillna(0, inplace=True)
+
+# Total Sales Over Time
+plt.figure(figsize=(12, 6))
+sales_over_time = df.groupby('date')['sales'].sum()
+plt.plot(sales_over_time.index, sales_over_time.values, marker='o', linestyle='-', color='b')
+plt.xlabel("Date")
+plt.ylabel("Total Sales")
+plt.title("Sales Trends Over Time")
+plt.xticks(rotation=45)
+plt.grid()
+plt.show()
+
+# Top Selling Products
+plt.figure(figsize=(10, 5))
+top_products = df.groupby('product')['sales'].sum().sort_values(ascending=False).head(10)
+top_products.plot(kind='bar', color='g')
+plt.xlabel("Product")
+plt.ylabel("Total Sales")
+plt.title("Top 10 Best-Selling Products")
+plt.xticks(rotation=45)
+plt.show()
+
+# Customer Age Distribution
+if 'age' in df.columns:
+    plt.figure(figsize=(8, 5))
+    df['age'].hist(bins=10, color='purple', edgecolor='black')
+    plt.xlabel("Age")
+    plt.ylabel("Number of Customers")
+    plt.title("Customer Age Distribution")
+    plt.show()
+
+# Customer Gender Distribution
+if 'gender' in df.columns:
+    plt.figure(figsize=(5, 5))
+    gender_counts = df['gender'].value_counts()
+    gender_counts.plot(kind='pie', autopct='%1.1f%%', colors=['blue', 'pink'])
+    plt.title("Customer Gender Distribution")
+    plt.ylabel('')
+    plt.show()
+
+# Peak Shopping Hours
+if 'timestamp' in df.columns:
+    df['hour'] = pd.to_datetime(df['timestamp']).dt.hour
+    plt.figure(figsize=(10, 5))
+    df['hour'].hist(bins=24, color='orange', edgecolor='black')
+    plt.xlabel("Hour of Day")
+    plt.ylabel("Number of Transactions")
+    plt.title("Peak Shopping Hours")
+    plt.show()
+
+# Sales by Category
+if 'category' in df.columns:
+    plt.figure(figsize=(10, 5))
+    category_sales = df.groupby('category')['sales'].sum().sort_values(ascending=False)
+    category_sales.plot(kind='bar', color='cyan')
+    plt.xlabel("Category")
+    plt.ylabel("Total Sales")
+    plt.title("Sales by Category")
+    plt.xticks(rotation=45)
+    plt.show()
+
+# Monthly Sales Trends
+if 'date' in df.columns:
+    df['month'] = df['date'].dt.to_period('M')
+    monthly_sales = df.groupby('month')['sales'].sum()
+    plt.figure(figsize=(12, 6))
+    plt.plot(monthly_sales.index.astype(str), monthly_sales.values, marker='o', linestyle='-', color='red')
+    plt.xlabel("Month")
+    plt.ylabel("Total Sales")
+    plt.title("Monthly Sales Trends")
+    plt.xticks(rotation=45)
+    plt.grid()
+    plt.show()
+
+print("Analysis Complete!")
